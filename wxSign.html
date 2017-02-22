@@ -1,0 +1,226 @@
+<!DOCTYPE html >
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>签到</title>
+	<link rel="stylesheet" type="text/css" href="assets/plugins/bootstrap/css/bootstrap.min.css">
+	<style type="text/css">
+		*{padding: 0px;margin: 0px;}
+		body{background: url(img/bg.png) center;}
+	    h1,h2{color: white;font-family: "微软雅黑";font-weight: bold;}
+	    p{color: white;font-family: "微软雅黑";}
+	    .navtitle{text-align: center;}
+		div.qrcode{position: absolute;top: 247px;right: 100px}
+		.seat img{width: 50px;}
+		.seat li{padding:12px 0px 20px 20px;}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div style="margin-top: 35px;">
+			<ul class="list-inline">
+				<li>
+					<img style="vertical-align:super;" src="img/logo.png" width="150">
+				</li>
+				<li style="margin-left: 175px;">
+					<h1 style="font-size: 60px">物流源产品发布会</h1>
+				</li>
+			</ul>
+			<div class="navtitle">
+				<h2 style="font-size: 40px">南软三周年庆典</h2>
+			</div>
+			<div style="">
+				<h6 id="pp" style="color:#F1F90D;font-weight: bold;text-align: center;font-size: 50px;font-family: '微软雅黑';letter-spacing: 0.1em"></h6>
+			</div>
+		</div>
+
+		<div style="margin-top:50px">
+			<div style="background: url(img/bg02.png);width: 70%">
+				<ul class="list-inline seat">
+					<li><img src="img/moren.png" ><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+					<li><img src="img/moren.png"><p>虚位以待</p></li>
+				</ul>
+			</div>
+			<div class="qrcode">
+				<img src="img/liantu.png" width="315" height="335">
+				<h2 style="font-size: 35px">请您扫描二维码签到</h2>
+			</div>
+		</div>
+
+		<div>
+			<h3><p>Powered by TECHNS OpenNDT</p></h3>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="assets/plugins/jquery/jquery-2.1.1.min.js"></script>
+<script language="javascript" src="assets/plugins/jquery/socket.io.min.js"></script>
+<script type="text/javascript">
+	//prepareElement();
+    //moveElement("pp",320,190,1);//括号中分别代表 元素ID，X移动多少，Y移动多少，多长时间完成移动
+	
+
+
+	var _socket = io.connect( "http://192.168.1.122:8086/" );
+	if (typeof(_socket) != "undefinded" || _socket != null ) {
+		_DoSignIn('sign_tv', 'NDT Sign Controller');			//登录
+
+		_socket.on ( 'connection', function()
+		{
+			var _log = 'connected';
+			$("[name='log']").val( _log );
+
+			_DoSignIn('sign_tv', 'NDT Sign Shower');
+		});
+		_socket.on( 'command', function(data)
+		{
+			var _from = data.from;
+			var _to = data.to;
+			var _msg = data.message[0];
+
+			$('#pp').text('热烈欢迎' + _msg.name + '的到来！');
+			prepareElement();
+			moveElement("pp",800,350,8);
+
+			$('.seat li').each(function() {
+				if (!$(this).hasClass('active')) {
+					$(this).addClass('active');
+					$(this).find('img').attr('src', _msg.icon);
+					$(this).find('p').text(_msg.name);
+
+				 	var	div0 = document.createElement("div");
+					div0.style.position = "absolute";
+					div0.style.left = $(this).find('img')[0].offsetLeft-20+"px";
+					div0.style.top = $(this).find('img')[0].offsetTop-20+"px";
+					div0.style.zIndex = "1";
+					div0.innerHTML = "<img src='"+$(this).find('img')[0].src+"' width=90 />";
+					$(div0).attr('class', 'showimg');
+					document.body.appendChild(div0);
+
+					setTimeout(function(){
+						$('.showimg').hide();
+					}, 500);
+
+					return false;
+				}
+			});
+		});
+		_socket.on( 'status', function(data)
+		{
+			var _log = $("[name='log']").val();
+			_log += '\r\n' + JSON.stringify( data);
+			$("[name='log']").val( _log );
+		});
+		_socket.on( 'logout', function(data)
+		{
+			var _log = $("[name='log']").val();
+			_log += '\r\n' + JSON.stringify( data);
+			$("[name='log']").val( _log );
+		});
+		_socket.on( 'login', function(data)
+		{
+			var _log = $("[name='log']").val();
+			_log += '\r\n' + JSON.stringify( data);
+			$("[name='log']").val( _log );
+		});
+	}
+
+	function _DoClear() {
+		$("[name='log']").val("");
+	}
+
+	function _DoStatus( id ) {
+		if (_socket)
+		{
+			_socket.emit( 'status', '{"cmd":"connections"}' );
+		}
+	}
+
+	function _DoSignOut( id ) {
+		if (_socket)
+		{
+			_socket.emit( 'logout', '{"id":"' + id + '"}' );
+		}	
+	}
+
+	function _DoSignIn( id, desc) {
+		if (_socket)
+		{
+			_socket.emit( 'login', '{"id":"' + id + '","name":"' + desc + '"}' );
+		}
+	}
+
+
+function prepareElement() {
+    var elem = document.getElementById("pp");
+    elem.style.position = "absolute"; //表示定位于相对于包含它的元素的指定坐标
+    elem.style.left = "0px";
+    elem.style.top = "0px";
+}
+function moveElement(elementId,final_x,final_y,interval) {
+
+   if(!elementId) return false; // 验证元素是否存在, 当elementId为空时对应值false，加！为真，则不再向下执行，
+    var elem = document.getElementById(elementId);		//获得指定元素,var elem=document.getElementById(elementId);
+    
+    var x=parseInt(elem.style.left);			//获得现在的坐标
+    var y=parseInt(elem.style.top);
+          //判断是否到了指定位置
+    if(x==final_x && y==final_y) {
+      $('#' + elementId).text(''); 
+      return;
+     }
+          //没有到达时继续向执行
+    if(x>final_x){
+      x--;
+    }
+    if(x<final_x){
+  		x++;
+ 	}
+    if(y>final_y){
+    	y--;
+    }
+    if(y<final_y){
+  		y++;
+    }
+     
+          //修改坐标位置
+  elem.style.left=x+"px";
+  elem.style.top=y+"px";
+     //自己调自己，实现连续移动
+  js="moveElement('"+elementId+"',"+final_x+","+final_y+","+interval+")";
+     //此句代码很费解，elementId,final_x等是变量，所有要在引号外，
+         //而elementId加两层引号是因为elementId中传来的是字符串的变量
+  setTimeout(js,interval); 
+      //setTimeout() 方法用于在指定的毫秒数后调用函数或计算表达式。
+      //提示：setTimeout() 只执行 code 一次。
+      //如果要多次调用，请使用 setInterval() 或者让 code 自身再次调用 setTimeout()。
+}
+</script>
+</html>

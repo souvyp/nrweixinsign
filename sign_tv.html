@@ -1,0 +1,104 @@
+<html>
+<head>
+<title>Test Page</title>
+<meta charset="utf-8">
+<script language="javascript" src="assets/plugins/jquery/jquery-2.1.1.min.js"></script>
+<script language="javascript" src="assets/plugins/jquery/socket.io.min.js"></script>
+</head>
+<body>
+<img src="img/logo_new.png" align="center" width="64">
+<button type="button" onclick="_DoClear()">Clear</button><br>
+<button type="button" onclick="_DoSignIn('sign_tv', 'NDT Sign Shower')">Sign In</button>&nbsp;
+<button type="button" onclick="_DoSignOut('sign_tv')">Sign Out</button>&nbsp;
+<button type="button" onclick="_DoStatus('sign_tv')">Status</button>
+<br>
+<b>Sign_TV</b><br>
+<div class="" style="width:100%;">
+	<textarea cols="100" rows="20" name="log" style="float:left; width:60%;"></textarea>
+	<div class="" style="float:left; width:40%;">
+		<img class="img_name" src="">
+		<p class="p_name">
+		</p>
+	</div>
+</div>
+<script language="javascript">
+var _socket = io.connect( "http://192.168.1.122:8086/" );
+
+if (typeof(_socket) != "undefinded" || _socket != null ) {
+	_DoSignIn('sign_tv', 'NDT Sign Controller');			//登录
+
+	_socket.on ( 'connected', function()
+	{
+		var _log = 'connected';
+		$("[name='log']").val( _log );
+	});
+	
+	_socket.on( 'command', function(data)
+	{
+		var _from = data.from;
+		var _to = data.to;
+		var _msg = data.message[0];
+		
+		//do your command handler here
+		$( "img.img_name" ).attr( "src", _msg.icon );
+		$( "p.p_name").html( _msg.name );
+
+		var _log = $("[name='log']").val();
+		_log += '\r\n' + JSON.stringify( data);
+		$("[name='log']").val( _log );
+	});
+	_socket.on( 'status', function(data)
+	{
+		var _log = $("[name='log']").val();
+		_log += '\r\n' + JSON.stringify( data);
+		$("[name='log']").val( _log );
+	});
+	_socket.on( 'logout', function(data)
+	{
+		var _log = $("[name='log']").val();
+		_log += '\r\n' + JSON.stringify( data);
+		$("[name='log']").val( _log );
+	});
+	_socket.on( 'login', function(data)
+	{
+		var _log = $("[name='log']").val();
+		_log += '\r\n' + JSON.stringify( data);
+		$("[name='log']").val( _log );
+	});
+}
+
+
+
+
+
+function _DoClear()
+{
+	$("[name='log']").val("");
+}
+
+function _DoStatus( id )
+{
+	if (_socket)
+	{
+		_socket.emit( 'status', '{"cmd":"connections"}' );
+	}
+}
+
+function _DoSignOut( id )
+{
+	if (_socket)
+	{
+		_socket.emit( 'logout', '{"id":"' + id + '"}' );
+	}	
+}
+
+function _DoSignIn( id, desc)
+{
+	if (_socket)
+	{
+		_socket.emit( 'login', '{"id":"' + id + '","name":"' + desc + '"}' );
+	}
+}
+</script>
+</body>
+</html>

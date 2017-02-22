@@ -1,0 +1,216 @@
+<!DOCTYPE html >
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>抽奖</title>
+	<link rel="stylesheet" type="text/css" href="assets/plugins/bootstrap/css/bootstrap.min.css">
+	<style type="text/css">
+		*{padding: 0px;margin: 0px;}
+		body{background: url(img/bg03.png) center;}
+	    h1,h2,h3,h4,h5,h6{color: white;font-family: "微软雅黑";letter-spacing: 0.1em;font-weight: bold;}
+	    p{color: white;font-family: "微软雅黑";}
+	    .navtitle{text-align: center;}
+
+		.seat img{width: 50px;}
+		.seat li{padding:12px 0px 20px 20px;}
+		.content li{width: 33%;height: 305px;}
+		img.seatImg{position: absolute;z-index: 1}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div style="margin-top: 35px;">
+			<ul class="list-inline">
+				<li>
+					<img style="vertical-align: super;" src="img/logo.png" width="150">
+				</li>
+				<li style="margin-left: 120px;">
+					<h1 style="font-size: 60px;font-weight: bold;">南软年会抽奖现场</h1>
+				</li>
+			</ul>
+		</div>
+
+		<div class="content" style="margin-top:60px;">
+			<ul class="list-inline">
+				<li class="seat">
+					<div style="position: absolute;">
+						<h3>一等奖&nbsp;&nbsp;<span class="one">?</span></h3>
+						<h3>二等奖&nbsp;&nbsp;<span class="two">?</span></h3>
+						<h3>三等奖&nbsp;&nbsp;<span class="three">?</span></h3>
+					</div>
+				</li>
+				<li >
+					<div id="circle"  style="height: 300px; width: 300px; border: 0px solid red; transform: rotate(0deg); transform-origin: 50% 50% 0px;" >
+						<img src="img/choujiang01.png" class="seatImg" width="50" height="50" style="top: -25px;    left: 125px;" >
+						<img src="img/choujiang02.png" class="seatImg" width="50" height="50" style="top: 30px;    left:10px;">
+						<img src="img/choujiang03.png" class="seatImg" width="50" height="50" style="top: 140px;    left: -25px;">
+						<img src="img/choujiang04.png" class="seatImg" width="50" height="50" style="top: 240px;    left: 30px;">
+						<img src="img/touxiang05.png" class="seatImg" width="50" height="50" style="bottom: -25px;    left: 125px;">
+						<img src="img/touxiang03.png" class="seatImg" width="50" height="50" style="top: 240px;    right: 30px;">
+						<img src="img/touxiang02.png" class="seatImg" width="50" height="50" style="top: 140px;   right:-25px;">
+						<img src="img/touxiang03.png" class="seatImg" width="50" height="50" style="top: 30px;   right:10px;">
+						<img src="img/yuanbg.png" width="300" height="300" style="position: absolute;top:0px;left: 0px">
+					</div>
+					<img id="myImg" src="img/lihe.png" width="180"  height="150" style="position: absolute;top: 250px;left: 550px">
+					<img class="hide lucky" src="img/lihua.png" width="250"  height="200" style="position: absolute;top: 215px;left: 515px">
+					<img class="hide lucky" src="img/touxiang02.png" width="120"  height="100" style="position: absolute;top: 260px;left: 580px">
+					<img class="hide lucky" src="img/huangguan.png" width="120"  height="100" style="position: absolute;top: 205px;left: 615px">
+
+					<div class="hide lucky" id="name" style="position: absolute;top: 375px;left: 550px;">
+						<h2 style="color: #DA2A26"></h2>
+					</div>
+				</li>
+				<li class="seat">
+					<div style="position: absolute;right: 110px">
+						<h3>一等奖&nbsp;&nbsp;<img class="one" src="img/moren.png" >&nbsp;&nbsp;<span>虚位以待</span></h3>
+						<h3>二等奖&nbsp;&nbsp;<img class="two" src="img/moren.png" >&nbsp;&nbsp;<span>虚位以待</span></h3>
+						<h3>三等奖&nbsp;&nbsp;<img class="three" src="img/moren.png" >&nbsp;&nbsp;<span>虚位以待</span></h3>
+					</div>
+				</li>
+			</ul>
+		</div>
+
+		<div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="assets/plugins/jquery/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="assets/plugins/jquery/jQueryRotate.js"></script>
+<script language="javascript" src="assets/plugins/jquery/socket.io.min.js"></script>
+<script type="text/javascript">
+	var timeOut = function(){  //超时函数
+		$("#circle").rotate({
+			angle:0, 
+			duration: 10000, 
+			animateTo: 2160, //这里是设置请求超时后返回的角度，所以应该还是回到最原始的位置，2160是因为我要让它转6圈，就是360*6得来的
+			callback:function(){
+				console.log('网络超时');
+			}
+		}); 
+	}; 
+	var rotateFunc = function(awards,angle,text){  //awards:奖项，angle:奖项对应的角度
+		$('#circle').stopRotate();
+		$("#circle").rotate({
+			angle:0, 
+			duration: 5000, 
+			animateTo: angle+1440, //angle是图片上各奖项对应的角度，1440是我要让指针旋转4圈。所以最后的结束的角度就是这样子^^
+			callback:function(){
+				$('div#name h2').text('恭喜'+ text.name +'！');
+				if (text.grade == '1') {
+					$('img.one').attr('src', text.icon);
+					$('img.one').next().text(text.name);
+				} else if (text.grade == '2') {
+					$('img.two').attr('src', text.icon);
+					$('img.two').next().text(text.name);
+				} else if (text.grade == '3') {
+					$('img.three').attr('src', text.icon);
+					$('img.three').next().text(text.name);
+				}
+
+				$('img#myImg').hide();
+				$('.lucky').removeClass('hide');
+
+				$('img.seatImg').each(function() {
+					if ($(this).attr('src') == text.icon) {
+						$(this).attr('src', 'img/moren.png');
+					}
+				});
+			}
+		}); 
+	};
+	
+	var _socket = io.connect( "http://192.168.1.122:8086/" );
+
+	if (typeof(_socket) != "undefinded" || _socket != null ) {
+		_DoluckyIn('lucky_tv', 'NDT lucky Controller');			//登录
+
+		_socket.on ( 'connection', function()
+		{
+			var _log = 'connected';
+			$("[name='log']").val( _log );
+
+			_DoluckyIn('lucky_tv', 'NDT lucky Shower');
+		});
+		_socket.on( 'command', function(data)
+		{
+			var _from = data.from;
+			var _to = data.to;
+			var _msg = data.message[0];
+
+			$('img#myImg').show();
+			$('.lucky').addClass('hide');
+
+			if ( _msg.grade == '1') {
+				$('span.one').text('苹果mini2');
+			} else if ( _msg.grade == '2') {
+				$('span.two').text('小米平板电脑');
+			} if ( _msg.grade == '3') {
+				$('span.three').text('格兰仕烤箱');
+			}
+
+			var time = [0,1];
+			time = time[Math.floor(Math.random()*time.length)];
+			if(time==0){
+				timeOut(); //网络超时
+			}
+			if(time==1){
+				var data = [1,2,3,0]; //返回的数组
+					data = data[Math.floor(Math.random()*data.length)];
+				rotateFunc(1,157,_msg);
+			}
+		});
+		_socket.on( 'status', function(data)
+		{
+			var _log = $("[name='log']").val();
+			_log += '\r\n' + JSON.stringify( data);
+			$("[name='log']").val( _log );
+		});
+		_socket.on( 'logout', function(data)
+		{
+			var _log = $("[name='log']").val();
+			_log += '\r\n' + JSON.stringify( data);
+			$("[name='log']").val( _log );
+		});
+		_socket.on( 'login', function(data)
+		{
+			var _log = $("[name='log']").val();
+			_log += '\r\n' + JSON.stringify( data);
+			$("[name='log']").val( _log );
+		});
+	}
+
+
+
+
+
+	function _DoClear()
+	{
+		$("[name='log']").val("");
+	}
+
+	function _DoStatus( id )
+	{
+		if (_socket)
+		{
+			_socket.emit( 'status', '{"cmd":"connections"}' );
+		}
+	}
+
+	function _DoluckyOut( id )
+	{
+		if (_socket)
+		{
+			_socket.emit( 'logout', '{"id":"' + id + '"}' );
+		}	
+	}
+
+	function _DoluckyIn( id, desc)
+	{
+		if (_socket)
+		{
+			_socket.emit( 'login', '{"id":"' + id + '","name":"' + desc + '"}' );
+		}
+	}
+</script>
+</html>

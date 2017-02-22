@@ -1,0 +1,93 @@
+<html>
+<head>
+<title>Test Page</title>
+<meta charset="utf-8">
+<script language="javascript" src="assets/plugins/jquery/jquery-2.1.1.min.js"></script>
+<script language="javascript" src="assets/plugins/jquery/socket.io.min.js"></script>
+</head>
+<body>
+<img src="img/logo_new.png" align="center" width="64">
+<button type="button" onclick="_DoClear()">Clear</button><br>
+<button type="button" onclick="_DoluckyIn('lucky_cp', 'NDT lucky Controller')">lucky In</button>&nbsp;
+<button type="button" onclick="_DoluckyOut('lucky_cp')">lucky Out</button>&nbsp;
+<button type="button" onclick="_DoCommand('lucky_cp', 'lucky_tv')">Send CMD</button>
+<button type="button" onclick="_DoStatus('lucky_cp')">Status</button>
+<button type="button" onclick="_DoCommand('lucky_cp', 'lucky_tv', '1')">一等奖</button>
+<button type="button" onclick="_DoCommand('lucky_cp', 'lucky_tv', '2')">二等奖</button>
+<button type="button" onclick="_DoCommand('lucky_cp', 'lucky_tv', '3')">三等奖</button>
+<button type="button" onclick="_DoCommand('lucky_cp', 'lucky_tv')">停止</button>
+<br>
+<b>lucky_CP</b><br>
+<textarea cols="100" rows="20" name="log"></textarea>
+<script language="javascript">
+var _socket = io.connect( "http://192.168.1.122:8086/" );
+
+if (typeof(_socket) != "undefinded" || _socket != null )
+{
+	_DoluckyIn('lucky_cp', 'NDT lucky Controller');		//登录
+
+	_socket.on( 'command', function(data)
+	{
+		var _log = $("[name='log']").val();
+		_log += '\r\n' + JSON.stringify( data);
+		$("[name='log']").val( _log );
+	});
+	_socket.on( 'status', function(data)
+	{
+		var _log = $("[name='log']").val();
+		_log += '\r\n' + JSON.stringify( data);
+		$("[name='log']").val( _log );
+	});
+	_socket.on( 'logout', function(data)
+	{
+		var _log = $("[name='log']").val();
+		_log += '\r\n' + JSON.stringify( data);
+		$("[name='log']").val( _log );
+	});
+	_socket.on( 'login', function(data)
+	{
+		var _log = $("[name='log']").val();
+		_log += '\r\n' + JSON.stringify( data);
+		$("[name='log']").val( _log );
+	});
+}
+
+function _DoClear()
+{
+	$("[name='log']").val("");
+}
+
+function _DoCommand( from, to, num )
+{
+	if (_socket)
+	{
+		_socket.emit( 'command', '[{"from":"' + from + '", "to" : "' + to + '", "message" : [{ "cmd" : "lucky", "name" : "唐达祁", "icon" : "img/touxiang02.png", "gender" : 1, "grade" : "'+ num +'"}]}]' );
+	}
+}
+
+function _DoStatus( id )
+{
+	if (_socket)
+	{
+		_socket.emit( 'status', '{"cmd":"connections"}' );
+	}
+}
+
+function _DoluckyOut( id )
+{
+	if (_socket)
+	{
+		_socket.emit( 'logout', '{"id":"' + id + '"}' );
+	}	
+}
+
+function _DoluckyIn( id, desc)
+{
+	if (_socket)
+	{
+		_socket.emit( 'login', '{"id":"' + id + '","name":"' + desc + '"}' );
+	}
+}
+</script>
+</body>
+</html>
